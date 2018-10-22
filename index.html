@@ -3,15 +3,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
 <body>
     <div id="app">
 
 
-    <div style="width: 100%;height: 70px;margin-bottom: 20px;" class="border">
+        <div style="width: 100%;height: 70px;margin-bottom: 20px;" class="border">
 
-        cart <b>{{ cart }}</b>
-    </div>
-    <section>
+            cart <span class="badge badge-pill badge-primary">{{ cart }}</span>
+        </div>
+        <section>
 
             <div class="container" style="width:800px;">
                 <div class="product row">
@@ -22,7 +23,7 @@
 
                     <div class="product-info col">
                         <h1>{{ title }}</h1>
-                        
+
                         <div class="detail">
                             <ul>
                                 <li v-for="d in detail">{{ d }}</li>
@@ -33,19 +34,21 @@
                             <ul style="list-style: none; ">
                                 <li v-for="variant in variants" :key="variant.variantId" :style="{ background: variant.variantColor, margin: '0 2px' }"
                                     class="badge text-white">
-                                    <span @mouseover="updateProduct(variant.image, variant.inventory)">{{ variant.variantColor|capitalize }}</span>
+                                    <span @mouseover="updateProduct(variant.variantId)">{{
+                                        variant.variantColor|capitalize }}</span>
                                 </li>
                             </ul>
                         </div>
 
                         <div>
-                            <p v-if="inventory > 10">In Stock {{inventory}}</p>
-                            <p v-else-if="inventory <= 10 && inventory > 0">Almost sold out! {{inventory}}</p>
-                            <p v-else>Out of Stock {{inventory}}</p>
+                            <p v-if="inventory <= 10 && inventory > 0">Almost sold out! {{inventory}}</p>
+                            <p v-else>Stock {{inventory}}</p>
                         </div>
 
                         <div>
-                            <button class="btn bg-primary text-white" @click="addToCart">add to cart</button>
+                            <button v-if="inventory > 0" class="btn bg-primary text-white" @click="addToCart">add to
+                                cart</button>
+                            <button v-if="inventory == 0" class="btn btn-secondary" disabled>Out of Stock</button>
                         </div>
 
                     </div>
@@ -53,57 +56,78 @@
                 </div>
 
             </div>
-    </section>
+        </section>
     </div>
 </body>
 <script>
     Vue.filter('capitalize', function (value) {
-    if (!value) return ''
-    value = value.toString()
-    return value.charAt(0).toUpperCase() + value.slice(1)
+        if (!value) return ''
+        value = value.toString()
+        return value.charAt(0).toUpperCase() + value.slice(1)
     })
 
     var app = new Vue({
         el: '#app',
         data: {
             cart: 0,
-            inventory: 0,
             brand: 'Tuture-o',
             product: 'XABCX',
-            title: null,
+            productId: null,
             image: null,
+            inventory: 0,
             detail: ['oisiiiiii 100%', 'strong OOOOOOOOOOOOOO 100%', 'Gender-neutral XXXXXXXXXXXXXXXXX'],
             variants: [
                 {
                     variantId: 101,
                     variantColor: "green",
-                    image: 'https://future-connect.co.jp/images/top_short_bnr03.png',
+                    image: 'https://i.imgur.com/lK5zaOe.gif',
                     inventory: 11,
                 },
                 {
                     variantId: 102,
                     variantColor: "black",
-                    image: 'https://future-connect.co.jp/images/top_short_bnr20.png',
+                    image: 'https://media.giphy.com/media/K5hfW8GxRxdSg/giphy.gif',
                     inventory: 10
+                },
+                {
+                    variantId: 103,
+                    variantColor: "orange",
+                    image: 'https://www.hypefresh.co/wp-content/uploads/2018/07/25638ca8b85cccc2d210923f86f3368b.gif',
+                    inventory: 100
                 }
             ]
         },
-        methods:{
-            addToCart(){
-                if(this.inventory > 0){
-                    this.inventory -= 1;
-                    this.cart += 1;
-                }
+        methods: {
+            addToCart() {
+                this.variants.forEach(vari => {
+                    if (vari.variantId == this.productId && vari.inventory > 0) {
+                        this.inventory = vari.inventory -= 1;
+                        this.cart += 1;
+                    }
+
+                });
             },
-            updateProduct(updateImage,updateInventory){
-                this.image = updateImage;
-                this.inventory = updateInventory;
+            updateProduct(variId) {
+                this.variants.forEach(vari => {
+                    if (vari.variantId == variId) {
+                        this.productId = vari.variantId;
+                        this.image = vari.image;
+                        this.inventory = vari.inventory;
+                    }
+                });
             }
         },
         mounted() {
-            this.title = this.brand + ' ' + this.product;
-            this.image = this.variants[0].image;
-            this.inventory = this.variants[0].inventory;
+            if (this.productId == null) {
+                this.productId = this.variants[0].variantId;
+                this.image = this.variants[0].image;
+                this.inventory = this.variants[0].inventory;
+            }
+        },
+        computed: {
+            title() {
+                return this.brand + ' ' + this.product;
+            }
         }
     })
 </script>
