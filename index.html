@@ -6,103 +6,101 @@
 
 <body>
     <div id="app">
-
-
         <div style="width: 100%;height: 70px;margin-bottom: 20px;" class="border">
-
             cart <span class="badge badge-pill badge-primary">{{ cart }}</span>
         </div>
+
+
         <section>
 
             <div class="container" style="width:800px;">
-                <div class="product row">
 
-                    <div class="product-image col">
-                        <img class="border" :src="image" style="width: 400px;">
-                    </div>
-
-                    <div class="product-info col">
-                        <h1>{{ title }}</h1>
-
-                        <div class="detail">
-                            <ul>
-                                <li v-for="d in detail">{{ d }}</li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <ul style="list-style: none; ">
-                                <li v-for="variant in variants" :key="variant.variantId" :style="{ background: variant.variantColor, margin: '0 2px' }"
-                                    class="badge text-white">
-                                    <span @mouseover="updateProduct(variant.variantId)">{{
-                                        variant.variantColor|capitalize }}</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <p v-if="inventory <= 10 && inventory > 0">Almost sold out! {{inventory}}</p>
-                            <p v-else>Stock {{inventory}}</p>
-                        </div>
-
-                        <div>
-                            <button v-if="inventory > 0" class="btn bg-primary text-white" @click="addToCart">add to
-                                cart</button>
-                            <button v-if="inventory == 0" class="btn btn-secondary" disabled>Out of Stock</button>
-                        </div>
-
-                    </div>
-
-                </div>
+                <product></product>
 
             </div>
-        </section>
+
+    </div>
+    </section>
     </div>
 </body>
 <script>
-    Vue.filter('capitalize', function (value) {
-        if (!value) return ''
-        value = value.toString()
-        return value.charAt(0).toUpperCase() + value.slice(1)
-    })
+    Vue.component('product', {
+        template: `
+        <div class="product row">
 
-    var app = new Vue({
-        el: '#app',
-        data: {
-            cart: 0,
-            brand: 'Tuture-o',
-            product: 'XABCX',
-            productId: null,
-            image: null,
-            inventory: 0,
-            detail: ['oisiiiiii 100%', 'strong OOOOOOOOOOOOOO 100%', 'Gender-neutral XXXXXXXXXXXXXXXXX'],
-            variants: [
-                {
-                    variantId: 101,
-                    variantColor: "green",
-                    image: 'https://i.imgur.com/lK5zaOe.gif',
-                    inventory: 11,
-                },
-                {
-                    variantId: 102,
-                    variantColor: "black",
-                    image: 'https://media.giphy.com/media/K5hfW8GxRxdSg/giphy.gif',
-                    inventory: 10
-                },
-                {
-                    variantId: 103,
-                    variantColor: "orange",
-                    image: 'https://www.hypefresh.co/wp-content/uploads/2018/07/25638ca8b85cccc2d210923f86f3368b.gif',
-                    inventory: 100
-                }
-            ]
+            <div class="product-image col">
+                <img class="border" :src="image" style="width: 400px;">
+            </div>
+
+            <div class="product-info col">
+                <h1>{{ title }}</h1>
+
+                <div class="detail">
+                    <ul>
+                        <li v-for="d in detail">{{ d }}</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <ul style="list-style: none; ">
+                        <li v-for="variant in variants" :key="variant.variantId" :style="{ background: variant.variantColor, margin: '0 2px' }"
+                            class="badge text-white">
+                            <span @mouseover="updateProduct(variant.variantId)">{{
+                                variant.variantColor|capitalize }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <p v-if="inventory <= 10 && inventory > 0">Almost sold out! {{inventory}}</p>
+                    <p v-else>Stock {{inventory}}</p>
+                </div>
+
+                <div>
+                    <button v-if="inventory > 0" class="btn bg-primary text-white" @click="addToCart">add to
+                        cart</button>
+                    <button v-if="inventory == 0" class="btn btn-secondary" disabled>Out of Stock</button>
+                </div>
+
+            </div>
+        </div>
+        `,
+        data() {
+            return {
+                brand: 'Tuture-o',
+                product: 'XABCX',
+                productId: null,
+                image: null,
+                inventory: 0,
+                detail: ['oisiiiiii 100%', 'strong OOOOOOOOOOOOOO 100%', 'Gender-neutral XXXXXXXXXXXXXXXXX'],
+                variants: [
+                    {
+                        variantId: 101,
+                        variantColor: "green",
+                        image: 'https://i.imgur.com/lK5zaOe.gif',
+                        inventory: 11,
+                    },
+                    {
+                        variantId: 102,
+                        variantColor: "black",
+                        image: 'https://media.giphy.com/media/K5hfW8GxRxdSg/giphy.gif',
+                        inventory: 10
+                    },
+                    {
+                        variantId: 103,
+                        variantColor: "orange",
+                        image: 'https://www.hypefresh.co/wp-content/uploads/2018/07/25638ca8b85cccc2d210923f86f3368b.gif',
+                        inventory: 100
+                    }
+                ]
+            }
         },
         methods: {
             addToCart() {
                 this.variants.forEach(vari => {
                     if (vari.variantId == this.productId && vari.inventory > 0) {
                         this.inventory = vari.inventory -= 1;
-                        this.cart += 1;
+                        app.cart += 1;
                     }
 
                 });
@@ -128,6 +126,20 @@
             title() {
                 return this.brand + ' ' + this.product;
             }
+        }
+
+    })
+
+    Vue.filter('capitalize', function (value) {
+        if (!value) return ''
+        value = value.toString()
+        return value.charAt(0).toUpperCase() + value.slice(1)
+    })
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            cart: 0,
         }
     })
 </script>
